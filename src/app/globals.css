@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #174A7E;
+  --secondary: #239B62;
+  --accent: #F59E0B;
+}
+
+body {
+  font-family: 'Inter', 'Noto Sans Telugu', system-ui, -apple-system, sans-serif;
+  color: #1F2937;
+  background-color: #F7F9FC;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.font-telugu {
+  font-family: 'Noto Sans Telugu', 'Inter', system-ui, sans-serif;
+}
+
+/* Ensure minimum touch target size */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
