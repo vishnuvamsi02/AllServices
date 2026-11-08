@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import { HomeMode } from '@/data/types';
 import { HeroSection } from '@/components/home/HeroSection';
+import { TopPromotionsCarousel } from '@/components/home/TopPromotionsCarousel';
 import { ExploreServicesSection } from '@/components/home/ExploreServicesSection';
 import { TopCategoriesGrid } from '@/components/home/TopCategoriesGrid';
-import { SponsoredBannerCard } from '@/components/home/SponsoredBannerCard';
 import { MarketBrandPromoCard } from '@/components/home/MarketBrandPromoCard';
 import { PropertiesSectionView } from '@/components/home/PropertiesSectionView';
 import { FeaturedProviders } from '@/components/home/FeaturedProviders';
@@ -28,19 +28,19 @@ export default function HomePage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
+        {/* Prominent Advertisement Showcase: FIRST Section Users See at Launch */}
+        <TopPromotionsCarousel onOpenPostAd={() => setShowPostAdModal(true)} />
+
         {/* Conditional View Based on Mode: Services vs Properties */}
         {mode === 'services' ? (
           <>
-            {/* Explore Services 4 Tabs matching Scazo Screen 10 */}
+            {/* Explore Services 4 Tabs */}
             <ExploreServicesSection />
 
-            {/* Local Merchant Flex Banner Ad matching Scazo Screen 05 / 07 / 11 */}
-            <SponsoredBannerCard />
-
-            {/* Top Categories 4-Column Grid matching Scazo Screen 12 & 14 */}
+            {/* Top Categories Grid */}
             <TopCategoriesGrid />
 
-            {/* Market Your Brand Promo Card ("Post Your Ad Here") + Connecting India matching Screen 08 */}
+            {/* Market Your Brand Promo Card ("Post Your Ad Here") */}
             <MarketBrandPromoCard onOpenPostAd={() => setShowPostAdModal(true)} />
 
             {/* Featured Village Providers */}
@@ -51,10 +51,7 @@ export default function HomePage() {
           </>
         ) : (
           <>
-            {/* Local Merchant Flex Banner Ad */}
-            <SponsoredBannerCard />
-
-            {/* Dedicated Properties Section matching Scazo Screens 05, 07, 09 */}
+            {/* Dedicated Properties Section matching Scazo Screens */}
             <PropertiesSectionView onOpenPostProperty={() => router.push('/auth/register?role=property_owner')} />
           </>
         )}

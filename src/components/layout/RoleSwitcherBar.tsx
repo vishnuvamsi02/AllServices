@@ -4,21 +4,40 @@ import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { UserRole } from '@/data/types';
-import { ShieldCheck, UserCheck, Wrench, Store, Landmark, Crown, Eye } from 'lucide-react';
+import { ShieldCheck, UserCheck, Wrench, Store, Landmark, Crown, Eye, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export const RoleSwitcherBar: React.FC = () => {
   const { role, switchRole, currentUser } = useAuth();
   const { isTelugu } = useLanguage();
+  const pathname = usePathname();
 
-  const roles: { key: UserRole; labelEn: string; labelTe: string; icon: any; color: string; href?: string }[] = [
+  const roles: { key: UserRole; labelEn: string; labelTe: string; icon: any; color: string; href: string }[] = [
     { key: 'guest', labelEn: 'Guest Visitor', labelTe: 'సందర్శకుడు', icon: Eye, color: 'text-slate-600', href: '/' },
     { key: 'customer', labelEn: 'Customer', labelTe: 'వినియోగదారుడు', icon: UserCheck, color: 'text-blue-600', href: '/dashboard/customer' },
-    { key: 'provider', labelEn: 'Service Provider', labelTe: 'సేవా నిపుణుడు', icon: Wrench, color: 'text-emerald-600', href: '/dashboard/provider' },
-    { key: 'business', labelEn: 'Local Business', labelTe: 'వ్యాపారస్తుడు', icon: Store, color: 'text-amber-600', href: '/dashboard/business' },
-    { key: 'village_admin', labelEn: 'Village Admin (Kaza)', labelTe: 'గ్రామ అడ్మిన్', icon: Landmark, color: 'text-indigo-600', href: '/dashboard/village-admin' },
-    { key: 'super_admin', labelEn: 'Super Admin (All AP)', labelTe: 'సూపర్ అడ్మిన్', icon: Crown, color: 'text-purple-600', href: '/dashboard/super-admin' },
+    { key: 'provider', labelEn: 'Provider', labelTe: 'సేవా నిపుణుడు', icon: Wrench, color: 'text-emerald-600', href: '/dashboard/provider' },
+    { key: 'business', labelEn: 'Business', labelTe: 'వ్యాపారస్తుడు', icon: Store, color: 'text-amber-600', href: '/dashboard/business' },
+    { key: 'village_admin', labelEn: 'Village Admin', labelTe: 'గ్రామ అడ్మిన్', icon: Landmark, color: 'text-indigo-600', href: '/dashboard/village-admin' },
+    { key: 'super_admin', labelEn: 'Super Admin', labelTe: 'సూపర్ అడ్మిన్', icon: Crown, color: 'text-purple-600', href: '/dashboard/super-admin' },
   ];
+
+  const getDashboardHref = () => {
+    switch (role) {
+      case 'provider':
+        return '/dashboard/provider';
+      case 'business':
+        return '/dashboard/business';
+      case 'village_admin':
+        return '/dashboard/village-admin';
+      case 'super_admin':
+        return '/dashboard/super-admin';
+      case 'customer':
+        return '/dashboard/customer';
+      default:
+        return '/';
+    }
+  };
 
   return (
     <div className="bg-slate-900 text-white text-xs border-b border-slate-800">
@@ -59,6 +78,16 @@ export const RoleSwitcherBar: React.FC = () => {
               </button>
             );
           })}
+
+          {role !== 'guest' && (
+            <Link
+              href={getDashboardHref()}
+              className="ml-1 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-[11px] transition-colors"
+            >
+              <span>{isTelugu ? 'డ్యాష్‌బోర్డ్' : 'Dashboard'}</span>
+              <ArrowUpRight className="w-3 h-3" />
+            </Link>
+          )}
         </div>
       </div>
     </div>

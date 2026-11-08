@@ -239,37 +239,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ mode, onModeChange }) 
         </form>
 
         {/* Top Segmented Mode Switcher [Services] & [Properties] matching Scazo Reference */}
-        <div className="mb-6">
+        <div>
           <ModeSwitcher mode={mode} onChange={onModeChange} />
         </div>
-
-        {/* Top Hero Banner matching Scazo Screen 10 */}
-        {mode === 'services' && (
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-50 via-white to-blue-50/60 border border-sky-200/80 p-5 sm:p-7 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-5 my-6 animate-in fade-in duration-300">
-            <div className="space-y-1.5 text-center sm:text-left">
-              <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-black bg-primary/10 text-primary uppercase tracking-wider">
-                {t('hero.localTag')}
-              </span>
-              <h2 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
-                {t('hero.trustedTag')}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-600 font-medium">
-                {isTelugu 
-                  ? 'మీ గ్రామంలో అందుబాటులో ఉన్న నిపుణులను ఒక్క క్లిక్‌తో సంప్రదించండి.' 
-                  : 'Certified electricians, plumbers, repair specialists, and agricultural helpers.'}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3 shrink-0">
-              <Link
-                href="/services"
-                className="px-5 py-3 bg-primary hover:bg-primary-hover text-white text-xs sm:text-sm font-extrabold rounded-2xl shadow-md transition-all active:scale-95"
-              >
-                {isTelugu ? 'సేవలను చూడండి' : 'Browse All Services'}
-              </Link>
-            </div>
-          </div>
-        )}
 
       </div>
 
