@@ -45,7 +45,7 @@ export const Footer: React.FC = () => {
             : 'Connecting rural citizens directly with verified village technicians, farm equipment, merchants, and local lands. Zero Middlemen • 0% Commission.'}
         </p>
 
-        {/* Helpline Pill & Verified Trust Badge */}
+        {/* Helpline Pill & Verified Trust Badge & Support Pill */}
         <div className="relative z-10 flex flex-wrap items-center justify-center gap-2.5 pt-1">
           <a
             href="tel:18004257382"
@@ -55,10 +55,54 @@ export const Footer: React.FC = () => {
             <span>{isTelugu ? 'ఉచిత టోల్‌ఫ్రీ సహాయవాణి:' : 'Toll-Free Helpline:'} 1800-425-SEVA</span>
           </a>
 
+          <Link
+            href="/support"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-xs font-bold text-rose-300 shadow-sm transition-colors"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-rose-400" />
+            <span>{isTelugu ? 'ఫిర్యాదులు & సహాయ కేంద్రం' : 'Customer Grievances & Help'}</span>
+          </Link>
+
           <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-slate-800 border border-slate-700/80 text-xs font-semibold text-slate-300">
             <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
             <span>{isTelugu ? '100% ధృవీకరించబడిన ప్రొఫైల్స్' : '100% Verified Profiles'}</span>
           </div>
+        </div>
+
+        {/* Official Social Channels Pills */}
+        <div className="relative z-10 flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] font-bold">
+          <a
+            href="https://chat.whatsapp.com/sample-sevasetu-ap"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors"
+          >
+            💬 WhatsApp Community
+          </a>
+          <a
+            href="https://youtube.com/@sevasetu_ap"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-colors"
+          >
+            ▶️ YouTube Channel
+          </a>
+          <a
+            href="https://instagram.com/sevasetu_ap"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20 hover:bg-pink-500/20 transition-colors"
+          >
+            📸 Instagram
+          </a>
+          <a
+            href="https://facebook.com/groups/sevasetu"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors"
+          >
+            👥 Facebook Group
+          </a>
         </div>
 
         {/* Quick App Links */}
@@ -69,6 +113,14 @@ export const Footer: React.FC = () => {
           <span className="text-slate-600">•</span>
           <Link href="/how-it-works" className="hover:text-white transition-colors">
             {isTelugu ? 'ఎలా పనిచేస్తుంది?' : 'How It Works'}
+          </Link>
+          <span className="text-slate-600">•</span>
+          <Link href="/rewards" className="hover:text-amber-400 text-amber-300 transition-colors font-bold">
+            {isTelugu ? 'ఉచిత రివార్డులు (10 సర్వీసులు)' : 'Free Rewards (10 Services)'}
+          </Link>
+          <span className="text-slate-600">•</span>
+          <Link href="/support" className="hover:text-white transition-colors">
+            {isTelugu ? 'ఫిర్యాదులు & సహాయం' : 'Complaints & Support'}
           </Link>
           <span className="text-slate-600">•</span>
           <Link href="/services" className="hover:text-white transition-colors">

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useMarketplace } from '@/context/MarketplaceContext';
+import { ChooseRewardSection } from '@/components/rewards/ChooseRewardSection';
 import {
   Gift,
   Award,
@@ -213,104 +214,9 @@ export default function MonthlyRewardsPage() {
         </div>
 
         {/* ======================================================== */}
-        {/* REWARD SELECTION CARDS (3 OPTIONS)                      */}
+        {/* REWARD SELECTION CARDS (HIGHLY INTERACTIVE REDESIGN)      */}
         {/* ======================================================== */}
-        <div className="mb-10">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                {isTelugu ? 'ఎంచుకోదగిన ఉచిత రివార్డులు (ఏదైనా ఒక్కటి మాత్రమే)' : 'Choose Your Free Reward (Select Any ONE)'}
-              </h2>
-              <p className="text-xs text-slate-500">
-                {progress.rewardUnlocked
-                  ? 'Your reward is unlocked! Pick your preferred automotive reward below and submit claim.'
-                  : 'Locked. Complete 10 vehicle services this month to choose your reward.'}
-              </p>
-            </div>
-
-            {progress.claimed && (
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                Claimed for {progress.monthName}
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {rewardDefinitions.map((reward) => {
-              const Icon = getRewardIcon(reward.id);
-              const isSelected = selectedRewardId === reward.id;
-
-              return (
-                <div
-                  key={reward.id}
-                  onClick={() => progress.rewardUnlocked && !progress.claimed && setSelectedRewardId(reward.id)}
-                  className={`relative rounded-3xl p-5 sm:p-6 transition-all duration-300 flex flex-col justify-between border-2 ${
-                    progress.rewardUnlocked && !progress.claimed ? 'cursor-pointer hover:shadow-lift' : 'opacity-90'
-                  } ${
-                    isSelected && progress.rewardUnlocked && !progress.claimed
-                      ? 'border-emerald-600 bg-white ring-4 ring-emerald-500/10 shadow-lg'
-                      : 'border-slate-200/90 bg-white'
-                  }`}
-                >
-                  {/* Top Badge */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700">
-                      {reward.badge}
-                    </span>
-                    <span className="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                      Worth ₹{reward.retailValue}
-                    </span>
-                  </div>
-
-                  {/* Icon & Details */}
-                  <div className="space-y-2 mb-5">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 text-primary flex items-center justify-center border border-indigo-100 shadow-xs">
-                      <Icon className="w-6 h-6 stroke-[2.2px]" />
-                    </div>
-
-                    <h3 className="text-base font-black text-slate-900 leading-snug">
-                      {isTelugu ? reward.teluguName : reward.name}
-                    </h3>
-
-                    <p className="text-xs text-slate-500 leading-relaxed">
-                      {isTelugu ? reward.teluguDescription : reward.description}
-                    </p>
-                  </div>
-
-                  {/* Action / Select Button */}
-                  <div>
-                    {progress.rewardUnlocked && !progress.claimed ? (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleClaim(reward.id);
-                        }}
-                        className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm ${
-                          isSelected
-                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
-                            : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
-                        }`}
-                      >
-                        <Gift className="w-4 h-4" />
-                        <span>{isTelugu ? 'ఈ రివార్డ్‌ను క్లెయిమ్ చేయండి' : 'Claim This Reward'}</span>
-                      </button>
-                    ) : progress.claimed ? (
-                      <div className="py-2 text-center text-xs font-bold text-slate-400 bg-slate-50 rounded-xl">
-                        {progress.activeClaim?.rewardId === reward.id ? 'Claimed by you' : 'Other reward selected'}
-                      </div>
-                    ) : (
-                      <div className="py-2 text-center text-xs font-bold text-slate-400 bg-slate-50 rounded-xl flex items-center justify-center gap-1">
-                        <Lock className="w-3.5 h-3.5" />
-                        <span>{progress.remainingCount} more jobs needed</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <ChooseRewardSection />
 
         {/* ======================================================== */}
         {/* CONTRIBUTING SERVICES BREAKDOWN TABLE                    */}

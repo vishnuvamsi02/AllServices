@@ -8,6 +8,7 @@ import { WriteReviewModal } from '@/components/common/WriteReviewModal';
 import { VehicleSelectorModal } from '@/components/common/VehicleSelectorModal';
 import { ProviderCard } from '@/components/cards/ProviderCard';
 import { BusinessCard } from '@/components/cards/BusinessCard';
+import { ChooseRewardSection } from '@/components/rewards/ChooseRewardSection';
 import {
   MessageSquare,
   Heart,
@@ -448,73 +449,8 @@ export default function CustomerDashboardPage() {
               </div>
             </div>
 
-            {/* Reward Choices Grid */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                    <Gift className="w-5 h-5 text-amber-500" />
-                    <span>Choose 1 of 3 Free Loyalty Rewards</span>
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Once 10 verified services are completed, claim your complimentary reward voucher.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {rewardDefinitions.map((reward) => {
-                  const isSelected = selectedRewardId === reward.id;
-
-                  return (
-                    <div
-                      key={reward.id}
-                      onClick={() => setSelectedRewardId(reward.id)}
-                      className={`p-5 rounded-3xl border-2 transition-all cursor-pointer relative flex flex-col justify-between ${
-                        isSelected
-                          ? 'border-amber-400 bg-amber-50/40 shadow-md ring-2 ring-amber-400/30'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
-                    >
-                      <div>
-                        <div className="flex items-center justify-between gap-2 mb-3">
-                          <span className="text-2xl">{reward.icon}</span>
-                          <span className="px-2.5 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800">
-                            Worth ₹{reward.retailValue} (FREE)
-                          </span>
-                        </div>
-                        <h4 className="text-base font-black text-slate-900">{isTelugu ? reward.teluguName : reward.name}</h4>
-                        <p className="text-xs text-slate-600 mt-1">{isTelugu ? reward.teluguDescription : reward.description}</p>
-                        <p className="text-[11px] text-slate-400 mt-2 font-medium">Valid for 60 days from issue</p>
-                      </div>
-
-                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-500">
-                          {isSelected ? 'Selected' : 'Select'}
-                        </span>
-                        {progress.rewardUnlocked ? (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleClaimReward(reward.id);
-                            }}
-                            className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-xs transition-colors"
-                          >
-                            Claim Now
-                          </button>
-                        ) : (
-                          <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
-                            <Lock className="w-3 h-3" />
-                            Need {progress.remainingCount} more
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            {/* Choose Your Free Reward – Redesigned Interactive Component */}
+            <ChooseRewardSection />
 
             {/* Contributing Services Table */}
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-card">

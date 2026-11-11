@@ -13,6 +13,7 @@ import {
   RewardAuditLog,
   RewardSystemConfig,
   AppNotification,
+  SupportTicket,
 } from '@/data/types';
 import {
   MOCK_ENQUIRIES,
@@ -27,6 +28,7 @@ import {
   MOCK_REWARD_CLAIMS,
   MOCK_REWARD_AUDIT_LOGS,
   MOCK_NOTIFICATIONS,
+  MOCK_SUPPORT_TICKETS,
 } from '@/data/mockData';
 
 export interface ToastMessage {
@@ -90,6 +92,11 @@ interface MarketplaceContextType {
   markNotificationRead: (id: string) => void;
   markAllNotificationsRead: (userId: string) => void;
 
+  // Support & Feedback
+  supportTickets: SupportTicket[];
+  createSupportTicket: (ticketData: Omit<SupportTicket, 'id' | 'ticketCode' | 'createdAt' | 'status'>) => SupportTicket;
+  updateSupportTicket: (ticketId: string, updates: Partial<SupportTicket>, adminName?: string) => void;
+
   // Bookings & Lifecycle
   addEnquiry: (data: Omit<Enquiry, 'id' | 'createdAt' | 'status'>) => string;
   updateEnquiryStatus: (id: string, status: Enquiry['status']) => void;
@@ -136,6 +143,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [rewardClaims, setRewardClaims] = useState<RewardClaim[]>(MOCK_REWARD_CLAIMS);
   const [rewardAuditLogs, setRewardAuditLogs] = useState<RewardAuditLog[]>(MOCK_REWARD_AUDIT_LOGS);
   const [notifications, setNotifications] = useState<AppNotification[]>(MOCK_NOTIFICATIONS);
+  const [supportTickets, setSupportTickets] = useState<SupportTicket[]>(MOCK_SUPPORT_TICKETS);
 
   const [favorites, setFavorites] = useState<{
     providers: string[];
@@ -493,6 +501,71 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     );
   };
 
+  // Support & Feedback Management
+  const createSupportTicket = (
+    data: Omit<SupportTicket, 'id' | 'ticketCode' | 'createdAt' | 'status'>
+  ): SupportTicket => {
+    const id = `tkt_${Date.now()}`;
+    const ticketCode = `TKT-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${Math.floor(100 + Math.random() * 899)}`;
+    const newTicket: SupportTicket = {
+      ...data,
+      id,
+      ticketCode,
+      status: 'submitted',
+      createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    setSupportTickets((prev) => [newTicket, ...prev]);
+
+    const notif: AppNotification = {
+      id: `notif_${Date.now()}`,
+      userId: data.customerId || 'cust_101',
+      userRole: 'customer',
+      title: 'Ticket Submitted Successfully',
+      message: `Your grievance/query #${ticketCode} has been routed to the administration team.`,
+      type: 'system',
+      timestamp: 'Just now',
+      read: false,
+      link: '/support?tab=track',
+    };
+    setNotifications((prev) => [notif, ...prev]);
+    showToast('success', 'Support Ticket Created', `Reference ID #${ticketCode} generated.`);
+    return newTicket;
+  };
+
+  const updateSupportTicket = (ticketId: string, updates: Partial<SupportTicket>, adminName = 'Village Admin') => {
+    setSupportTickets((prev) =>
+      prev.map((t) => {
+        if (t.id === ticketId || t.ticketCode === ticketId) {
+          const updated = {
+            ...t,
+            ...updates,
+            resolvedBy: updates.status === 'resolved' ? (updates.resolvedBy || adminName) : t.resolvedBy,
+            resolvedAt: updates.status === 'resolved' ? (updates.resolvedAt || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' at ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) : t.resolvedAt,
+          };
+
+          const notif: AppNotification = {
+            id: `notif_${Date.now()}`,
+            userId: t.customerId,
+            userRole: 'customer',
+            title: updates.status === 'resolved' ? 'Support Ticket Resolved' : 'Support Ticket Updated',
+            message: updates.status === 'resolved'
+              ? `Admin resolved your ticket #${t.ticketCode}: "${updates.adminResponse || 'Resolution provided'}"`
+              : `Your ticket #${t.ticketCode} is currently under investigation by ${adminName}.`,
+            type: 'system',
+            timestamp: 'Just now',
+            read: false,
+            link: '/support?tab=track',
+          };
+          setNotifications((nPrev) => [notif, ...nPrev]);
+          return updated;
+        }
+        return t;
+      })
+    );
+    showToast('success', 'Ticket Updated', 'Support ticket status updated.');
+  };
+
   // Bookings Management
   const addEnquiry = (data: Omit<Enquiry, 'id' | 'createdAt' | 'status'>): string => {
     const newId = `BK-${Math.floor(200 + Math.random() * 800)}`;
@@ -733,6 +806,9 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         serviceCompletions,
         rewardAuditLogs,
         notifications,
+        supportTickets,
+        createSupportTicket,
+        updateSupportTicket,
         getMonthlyRewardProgress,
         claimMonthlyReward,
         adminApproveRewardClaim,

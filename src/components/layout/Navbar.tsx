@@ -68,9 +68,11 @@ export const Navbar: React.FC = () => {
     { href: '/properties', label: t('nav.properties'), icon: Building2, color: 'text-emerald-500 bg-emerald-50' },
     { href: '/businesses', label: t('nav.businesses'), icon: Store, color: 'text-purple-500 bg-purple-50' },
     { href: '/how-it-works', label: t('nav.howItWorks'), icon: HelpCircle, color: 'text-rose-500 bg-rose-50' },
+    { href: '/support', label: isTelugu ? 'సహాయం' : 'Support', icon: HelpCircle, color: 'text-sky-500 bg-sky-50' },
   ];
 
   const getPageTitle = () => {
+    if (pathname.startsWith('/support')) return isTelugu ? 'సహాయం & ఫిర్యాదులు' : 'Help & Support';
     if (pathname.startsWith('/services')) return isTelugu ? 'గ్రామ సేవలు' : 'Village Services';
     if (pathname.startsWith('/properties')) return isTelugu ? 'ఆస్తులు & భూములు' : 'Properties & Lands';
     if (pathname.startsWith('/businesses')) return isTelugu ? 'గ్రామ దుకాణాలు' : 'Local Businesses';

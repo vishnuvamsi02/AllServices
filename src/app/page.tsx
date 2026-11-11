@@ -11,6 +11,8 @@ import { MarketBrandPromoCard } from '@/components/home/MarketBrandPromoCard';
 import { PropertiesSectionView } from '@/components/home/PropertiesSectionView';
 import { FeaturedProviders } from '@/components/home/FeaturedProviders';
 import { LocalBusinesses } from '@/components/home/LocalBusinesses';
+import { MarketingValuePropsSection } from '@/components/home/MarketingValuePropsSection';
+import { SocialMediaCommunitySection } from '@/components/home/SocialMediaCommunitySection';
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { RegisterCTASection } from '@/components/home/RegisterCTASection';
 import { PostAdModal } from '@/components/common/PostAdModal';
@@ -50,6 +52,9 @@ export default function HomePage() {
             {/* Featured Village Providers */}
             <FeaturedProviders />
 
+            {/* Why Choose SevaSetu: 5 Marketing Pillars & Transparency Comparison */}
+            <MarketingValuePropsSection />
+
             {/* Local Village Shops */}
             <LocalBusinesses />
           </>
@@ -62,6 +67,9 @@ export default function HomePage() {
 
         {/* How It Works 3-Step Process */}
         <HowItWorksSection />
+
+        {/* Official Social Media Community, Channels & Helpline */}
+        <SocialMediaCommunitySection />
 
         {/* Free Registration Call to Action */}
         <RegisterCTASection />

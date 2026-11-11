@@ -304,12 +304,36 @@ export interface AppNotification {
   link?: string;
 }
 
+export type SupportCategory =
+  | 'complaint'
+  | 'query'
+  | 'service_issue'
+  | 'suggestion'
+  | 'rewards_offers'
+  | 'other';
+
+export type TicketPriority = 'normal' | 'high' | 'urgent';
+export type TicketStatus = 'submitted' | 'in_progress' | 'resolved' | 'closed';
+
 export interface SupportTicket {
   id: string;
+  ticketCode: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  villageName?: string;
+  category: SupportCategory | string;
+  categoryLabel?: string;
   subject: string;
-  category: string;
   description: string;
-  status: 'open' | 'in_progress' | 'resolved';
+  status: TicketStatus | 'open';
+  priority: TicketPriority;
+  relatedBookingId?: string;
+  attachmentName?: string;
+  attachmentSize?: string;
+  adminResponse?: string;
+  resolvedBy?: string;
+  resolvedAt?: string;
   createdAt: string;
 }
 

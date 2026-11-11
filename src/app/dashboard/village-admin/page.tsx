@@ -5,7 +5,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useMarketplace } from '@/context/MarketplaceContext';
 import { MOCK_VILLAGES } from '@/data/mockData';
-import { RewardClaim } from '@/data/types';
+import { RewardClaim, SupportTicket } from '@/data/types';
 import {
   Landmark,
   ShieldCheck,
@@ -30,6 +30,14 @@ import {
   Car,
   Filter,
   PackageCheck,
+  HelpCircle,
+  Send,
+  Paperclip,
+  Phone,
+  MessageCircle,
+  AlertTriangle,
+  Flame,
+  CheckSquare,
 } from 'lucide-react';
 
 export default function VillageAdminDashboardPage() {
@@ -45,6 +53,8 @@ export default function VillageAdminDashboardPage() {
     adminRejectRewardClaim,
     markRewardRedeemed,
     serviceCompletions,
+    supportTickets,
+    updateSupportTicket,
   } = useMarketplace();
 
   // Strict village data isolation: Derives village from logged in admin's account
@@ -52,8 +62,15 @@ export default function VillageAdminDashboardPage() {
   const village = MOCK_VILLAGES.find((v) => v.id === assignedVillageId) || MOCK_VILLAGES[0];
 
   // Active admin tab
-  const [adminTab, setAdminTab] = useState<'rewards' | 'approvals' | 'enquiries'>('rewards');
+  const [adminTab, setAdminTab] = useState<'rewards' | 'approvals' | 'enquiries' | 'support'>('rewards');
   const [rewardFilter, setRewardFilter] = useState<'all' | 'pending_admin_approval' | 'approved' | 'redeemed'>('all');
+
+  // Support tickets filter & resolution modal state
+  const [ticketFilter, setTicketFilter] = useState<'all' | 'submitted' | 'in_progress' | 'resolved'>('all');
+  const [ticketSearch, setTicketSearch] = useState('');
+  const [activeTicketForModal, setActiveTicketForModal] = useState<SupportTicket | null>(null);
+  const [resolutionReplyText, setResolutionReplyText] = useState('');
+  const [resolutionStatus, setResolutionStatus] = useState<'resolved' | 'in_progress'>('resolved');
 
   // Inspection modal
   const [inspectClaim, setInspectClaim] = useState<RewardClaim | null>(null);
@@ -93,6 +110,53 @@ export default function VillageAdminDashboardPage() {
 
   const handleRedeem = (claimId: string) => {
     markRewardRedeemed(claimId, `${village.name} AutoCare Hub`);
+  };
+
+  // Filter support tickets
+  const filteredTickets = supportTickets.filter((ticket) => {
+    if (ticketFilter !== 'all' && ticket.status !== ticketFilter) return false;
+    if (ticketSearch.trim()) {
+      const q = ticketSearch.toLowerCase();
+      return (
+        ticket.ticketCode.toLowerCase().includes(q) ||
+        ticket.customerName.toLowerCase().includes(q) ||
+        ticket.subject.toLowerCase().includes(q) ||
+        ticket.customerPhone.includes(q) ||
+        (ticket.villageName && ticket.villageName.toLowerCase().includes(q))
+      );
+    }
+    return true;
+  });
+
+  const handleOpenResolveModal = (ticket: SupportTicket) => {
+    setActiveTicketForModal(ticket);
+    setResolutionReplyText(ticket.adminResponse || '');
+    setResolutionStatus('resolved');
+  };
+
+  const handleConfirmResolution = () => {
+    if (!activeTicketForModal || !resolutionReplyText.trim()) return;
+    updateSupportTicket(
+      activeTicketForModal.id,
+      {
+        status: resolutionStatus,
+        adminResponse: resolutionReplyText.trim(),
+        resolvedBy: `${village.name} Administration (${village.adminName || 'Admin Officer'})`,
+      },
+      village.adminName || 'Village Admin'
+    );
+    setActiveTicketForModal(null);
+    setResolutionReplyText('');
+  };
+
+  const handleQuickMarkInProgress = (ticketId: string) => {
+    updateSupportTicket(
+      ticketId,
+      {
+        status: 'in_progress',
+      },
+      village.adminName || 'Village Admin'
+    );
   };
 
   const claimStatusBadge = (status: RewardClaim['status']) => {
@@ -286,6 +350,22 @@ export default function VillageAdminDashboardPage() {
           >
             <MessageSquare className="w-4 h-4" />
             <span>Village Bookings & Enquiries ({villageEnquiries.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setAdminTab('support')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 ${
+              adminTab === 'support'
+                ? 'bg-rose-600 text-white shadow-xs font-black'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <HelpCircle className="w-4 h-4" />
+            <span>Customer Grievances & Support ({supportTickets.length})</span>
+            {supportTickets.some((t) => t.status === 'submitted' || t.priority === 'urgent') && (
+              <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+            )}
           </button>
         </div>
 
@@ -596,6 +676,306 @@ export default function VillageAdminDashboardPage() {
           </div>
         )}
 
+        {/* TAB 4: CITIZEN GRIEVANCES & SUPPORT RESOLUTION */}
+        {adminTab === 'support' && (
+          <div className="space-y-4">
+            
+            {/* Header Card with Stats */}
+            <div className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-card">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                    <HelpCircle className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-black text-slate-900 tracking-tight">
+                      Customer Grievances, Complaints & Support Hub
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                      Manage citizen issues, inspect service bills, and dispatch official resolution replies directly.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap text-xs font-bold">
+                  <div className="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700">
+                    Total: <strong className="text-slate-900">{supportTickets.length}</strong>
+                  </div>
+                  <div className="px-3 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Pending: <strong className="text-amber-900">{supportTickets.filter((t) => t.status === 'submitted').length}</strong>
+                  </div>
+                  <div className="px-3 py-1.5 rounded-xl bg-blue-50 text-blue-800 border border-blue-200 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-blue-500" />
+                    In Progress: <strong className="text-blue-900">{supportTickets.filter((t) => t.status === 'in_progress').length}</strong>
+                  </div>
+                  <div className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    Resolved: <strong className="text-emerald-900">{supportTickets.filter((t) => t.status === 'resolved').length}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Filter Tabs & Search */}
+              <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-bold overflow-x-auto">
+                  <button
+                    type="button"
+                    onClick={() => setTicketFilter('all')}
+                    className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+                      ticketFilter === 'all'
+                        ? 'bg-white text-slate-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    All ({supportTickets.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTicketFilter('submitted')}
+                    className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+                      ticketFilter === 'submitted'
+                        ? 'bg-white text-amber-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Pending Review ({supportTickets.filter((t) => t.status === 'submitted').length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTicketFilter('in_progress')}
+                    className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+                      ticketFilter === 'in_progress'
+                        ? 'bg-white text-blue-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    In Progress ({supportTickets.filter((t) => t.status === 'in_progress').length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTicketFilter('resolved')}
+                    className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap ${
+                      ticketFilter === 'resolved'
+                        ? 'bg-white text-emerald-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Resolved ({supportTickets.filter((t) => t.status === 'resolved').length})
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={ticketSearch}
+                    onChange={(e) => setTicketSearch(e.target.value)}
+                    placeholder="Search by ID, name, subject, phone..."
+                    className="w-full sm:w-64 pl-3 pr-8 py-1.5 rounded-xl text-xs border border-slate-200 focus:outline-none focus:border-rose-500 bg-slate-50 focus:bg-white transition-all"
+                  />
+                  {ticketSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setTicketSearch('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Tickets Grid / List */}
+            {filteredTickets.length === 0 ? (
+              <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/90 shadow-card">
+                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
+                <h3 className="text-base font-bold text-slate-900">
+                  No grievances found matching this filter
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  All customer queries and complaints in this category are up to date.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {filteredTickets.map((ticket) => (
+                  <div
+                    key={ticket.id}
+                    className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-card hover:border-slate-300 transition-all space-y-3.5"
+                  >
+                    {/* Top Row: Ticket Code, Priority, Category, Status */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono text-xs font-black px-2.5 py-1 bg-slate-900 text-white rounded-lg">
+                          #{ticket.ticketCode}
+                        </span>
+
+                        {/* Priority Badge */}
+                        {ticket.priority === 'urgent' && (
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-rose-100 text-rose-800 border border-rose-300 flex items-center gap-1 animate-pulse">
+                            <Flame className="w-3 h-3 text-rose-600" />
+                            Urgent Priority
+                          </span>
+                        )}
+                        {ticket.priority === 'high' && (
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1">
+                            <AlertTriangle className="w-3 h-3 text-amber-600" />
+                            High Priority
+                          </span>
+                        )}
+                        {ticket.priority === 'normal' && (
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-slate-400" />
+                            Normal Priority
+                          </span>
+                        )}
+
+                        {/* Category Label */}
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 capitalize">
+                          {ticket.categoryLabel || ticket.category.replace('_', ' ')}
+                        </span>
+                      </div>
+
+                      {/* Status Badge */}
+                      <div>
+                        {ticket.status === 'submitted' && (
+                          <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-200 flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 text-amber-600" />
+                            Pending Review
+                          </span>
+                        )}
+                        {ticket.status === 'in_progress' && (
+                          <span className="px-3 py-1 rounded-full text-xs font-black bg-blue-100 text-blue-900 border border-blue-200 flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 text-blue-600" />
+                            In Progress
+                          </span>
+                        )}
+                        {ticket.status === 'resolved' && (
+                          <span className="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-200 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            Resolved
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Customer Info Strip with Direct Phone & WhatsApp Contacts */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-1.5 text-slate-900 font-extrabold">
+                          <Users className="w-4 h-4 text-slate-400" />
+                          <span>{ticket.customerName}</span>
+                        </div>
+                        <span className="text-slate-300">•</span>
+                        <a
+                          href={`tel:${ticket.customerPhone}`}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-900 font-bold transition-colors"
+                        >
+                          <Phone className="w-3 h-3 text-blue-600" />
+                          +91 {ticket.customerPhone}
+                        </a>
+                        <a
+                          href={`https://wa.me/91${ticket.customerPhone}?text=Hello%20${encodeURIComponent(ticket.customerName)},%20regarding%20your%20support%20ticket%20${ticket.ticketCode}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-bold transition-colors"
+                        >
+                          <MessageCircle className="w-3 h-3 text-emerald-600" />
+                          WhatsApp
+                        </a>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-slate-500 font-medium text-[11px]">
+                        <span>Village: <strong className="text-slate-800">{ticket.villageName || village.name}</strong></span>
+                        <span>•</span>
+                        <span>{ticket.createdAt}</span>
+                      </div>
+                    </div>
+
+                    {/* Related Booking Badge if present */}
+                    {ticket.relatedBookingId && (
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold">
+                        <Car className="w-3.5 h-3.5 text-purple-600" />
+                        <span>Related Service Booking: <strong className="font-mono text-purple-950 font-black">#{ticket.relatedBookingId}</strong></span>
+                      </div>
+                    )}
+
+                    {/* Subject & Description */}
+                    <div>
+                      <h4 className="text-sm font-black text-slate-900 mb-1.5">
+                        {ticket.subject}
+                      </h4>
+                      <p className="text-xs text-slate-700 bg-slate-50/70 p-3.5 rounded-2xl border border-slate-100 leading-relaxed whitespace-pre-wrap">
+                        {ticket.description}
+                      </p>
+                    </div>
+
+                    {/* Attached Photo/Bill if present */}
+                    {ticket.attachmentName && (
+                      <div className="flex items-center gap-2 text-xs bg-amber-50 border border-amber-200/80 p-2.5 rounded-xl text-amber-900">
+                        <Paperclip className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span className="font-bold">Attached Bill / Proof:</span>
+                        <span className="underline font-mono">{ticket.attachmentName}</span>
+                        {ticket.attachmentSize && (
+                          <span className="text-[11px] text-amber-700">({ticket.attachmentSize})</span>
+                        )}
+                        <span className="ml-auto text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md">
+                          Uploaded by Customer
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Official Resolution Response Box */}
+                    {ticket.adminResponse && (
+                      <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl space-y-1.5">
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-xs">
+                          <span className="font-black text-emerald-950 flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            Official Administrative Resolution:
+                          </span>
+                          <span className="text-[11px] font-bold text-emerald-800">
+                            By {ticket.resolvedBy || 'Village Admin'} • {ticket.resolvedAt}
+                          </span>
+                        </div>
+                        <p className="text-xs text-emerald-900 font-medium leading-relaxed whitespace-pre-wrap">
+                          {ticket.adminResponse}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                      {ticket.status === 'submitted' && (
+                        <button
+                          type="button"
+                          onClick={() => handleQuickMarkInProgress(ticket.id)}
+                          className="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl transition-colors"
+                        >
+                          Mark In Progress
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleOpenResolveModal(ticket)}
+                        className={`px-4 py-2 rounded-xl text-xs font-black shadow-xs transition-colors flex items-center gap-1.5 ${
+                          ticket.status === 'resolved'
+                            ? 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                        }`}
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>{ticket.status === 'resolved' ? 'Update Official Resolution' : 'Respond & Resolve Grievance'}</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
 
       {/* INSPECT 10 CONTRIBUTING SERVICES MODAL */}
@@ -756,6 +1136,132 @@ export default function VillageAdminDashboardPage() {
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-black rounded-xl shadow-xs transition-colors"
               >
                 Confirm Rejection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RESOLVE GRIEVANCE MODAL */}
+      {activeTicketForModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 relative">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTicketForModal(null);
+                setResolutionReplyText('');
+              }}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-xl hover:bg-slate-100"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-slate-900">
+                  Respond & Resolve Citizen Grievance
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Ticket #{activeTicketForModal.ticketCode} • {activeTicketForModal.customerName}
+                </p>
+              </div>
+            </div>
+
+            {/* Ticket Subject summary */}
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 mb-3 text-xs space-y-1">
+              <span className="font-black text-slate-900 block truncate">
+                {activeTicketForModal.subject}
+              </span>
+              <p className="text-slate-600 line-clamp-2">
+                {activeTicketForModal.description}
+              </p>
+            </div>
+
+            {/* Quick response templates */}
+            <div className="mb-3">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                Quick Resolution Templates:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  'Technician contacted & re-inspection scheduled at your doorstep today.',
+                  'Refund voucher of ₹200 processed to your wallet due to service delay.',
+                  'Explanation provided over phone call; grievance settled satisfactorily.',
+                  'Genuine spare part replacement warranty confirmed by certified mechanic.',
+                ].map((template) => (
+                  <button
+                    key={template}
+                    type="button"
+                    onClick={() => setResolutionReplyText(template)}
+                    className="text-[11px] font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-lg text-left"
+                  >
+                    + {template.substring(0, 38)}...
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Textarea */}
+            <div className="space-y-1.5 mb-4">
+              <label className="text-xs font-bold text-slate-700">
+                Official Administrative Resolution Note:
+              </label>
+              <textarea
+                value={resolutionReplyText}
+                onChange={(e) => setResolutionReplyText(e.target.value)}
+                placeholder="Type resolution explanation, technician action taken, or voucher details..."
+                rows={4}
+                className="w-full text-xs p-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none resize-none"
+              />
+            </div>
+
+            {/* Status radio */}
+            <div className="flex items-center gap-4 mb-4 text-xs font-bold">
+              <label className="flex items-center gap-1.5 cursor-pointer">
+                <input
+                  type="radio"
+                  name="resolutionStatus"
+                  checked={resolutionStatus === 'resolved'}
+                  onChange={() => setResolutionStatus('resolved')}
+                  className="accent-emerald-600"
+                />
+                <span className="text-emerald-900">Mark as Resolved</span>
+              </label>
+              <label className="flex items-center gap-1.5 cursor-pointer">
+                <input
+                  type="radio"
+                  name="resolutionStatus"
+                  checked={resolutionStatus === 'in_progress'}
+                  onChange={() => setResolutionStatus('in_progress')}
+                  className="accent-blue-600"
+                />
+                <span className="text-blue-900">Keep as In Progress</span>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTicketForModal(null);
+                  setResolutionReplyText('');
+                }}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!resolutionReplyText.trim()}
+                onClick={handleConfirmResolution}
+                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-black rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Save & Notify Citizen</span>
               </button>
             </div>
           </div>
