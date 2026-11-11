@@ -9,163 +9,159 @@ import {
   ArrowLeft,
   Search,
   X,
-  Zap,
+  Bike,
+  Car,
   Droplets,
   Sparkles,
   Snowflake,
-  Refrigerator,
-  WashingMachine,
+  BatteryCharging,
+  Disc,
+  AlertCircle,
   Paintbrush,
-  Hammer,
-  Truck,
-  Filter,
-  Bug,
-  Car,
-  Key,
   Wrench,
-  Sun,
-  Camera,
-  Utensils,
-  HardHat,
-  Video,
-  Scissors,
-  Tv,
-  Flame,
-  Layers,
-  Grid,
+  ClipboardCheck,
+  Truck,
+  ShieldCheck,
+  ChevronRight,
 } from 'lucide-react';
 
 const iconMap: Record<string, any> = {
-  Zap,
+  Bike,
+  Car,
   Droplets,
   Sparkles,
   Snowflake,
-  Refrigerator,
-  WashingMachine,
+  BatteryCharging,
+  Disc,
+  AlertCircle,
   Paintbrush,
-  Hammer,
-  Truck,
-  Filter,
-  Bug,
-  Car,
-  Key,
   Wrench,
-  Sun,
-  Camera,
-  Utensils,
-  HardHat,
-  Video,
-  Scissors,
-  Tv,
-  Flame,
-  Layers,
-  Grid,
+  ClipboardCheck,
+  Truck,
 };
 
 const categoryIconColors: Record<string, { iconColor: string; bg: string }> = {
-  Zap: { iconColor: 'text-amber-500', bg: 'bg-amber-50' },
-  Droplets: { iconColor: 'text-sky-500', bg: 'bg-sky-50' },
-  Sparkles: { iconColor: 'text-emerald-500', bg: 'bg-emerald-50' },
-  Snowflake: { iconColor: 'text-teal-500', bg: 'bg-teal-50' },
-  Refrigerator: { iconColor: 'text-indigo-500', bg: 'bg-indigo-50' },
-  WashingMachine: { iconColor: 'text-cyan-500', bg: 'bg-cyan-50' },
-  Paintbrush: { iconColor: 'text-rose-500', bg: 'bg-rose-50' },
-  Hammer: { iconColor: 'text-orange-600', bg: 'bg-orange-50' },
-  Truck: { iconColor: 'text-blue-500', bg: 'bg-blue-50' },
-  Filter: { iconColor: 'text-sky-600', bg: 'bg-sky-50' },
-  Bug: { iconColor: 'text-lime-600', bg: 'bg-lime-50' },
-  Car: { iconColor: 'text-amber-600', bg: 'bg-amber-50' },
-  Key: { iconColor: 'text-violet-500', bg: 'bg-violet-50' },
-  Sun: { iconColor: 'text-yellow-600', bg: 'bg-yellow-50' },
-  Camera: { iconColor: 'text-fuchsia-500', bg: 'bg-fuchsia-50' },
-  Utensils: { iconColor: 'text-red-500', bg: 'bg-red-50' },
-  HardHat: { iconColor: 'text-yellow-700', bg: 'bg-yellow-50' },
-  Scissors: { iconColor: 'text-pink-500', bg: 'bg-pink-50' },
-  Tv: { iconColor: 'text-purple-500', bg: 'bg-purple-50' },
-  Flame: { iconColor: 'text-orange-600', bg: 'bg-orange-50' },
-  Layers: { iconColor: 'text-slate-600', bg: 'bg-slate-100' },
-  Grid: { iconColor: 'text-stone-600', bg: 'bg-stone-100' },
+  Bike: { iconColor: 'text-blue-600', bg: 'bg-blue-50' },
+  Car: { iconColor: 'text-indigo-600', bg: 'bg-indigo-50' },
+  Droplets: { iconColor: 'text-amber-600', bg: 'bg-amber-50' },
+  Sparkles: { iconColor: 'text-emerald-600', bg: 'bg-emerald-50' },
+  Snowflake: { iconColor: 'text-teal-600', bg: 'bg-teal-50' },
+  BatteryCharging: { iconColor: 'text-yellow-600', bg: 'bg-yellow-50' },
+  Disc: { iconColor: 'text-rose-600', bg: 'bg-rose-50' },
+  AlertCircle: { iconColor: 'text-orange-600', bg: 'bg-orange-50' },
+  Paintbrush: { iconColor: 'text-pink-600', bg: 'bg-pink-50' },
+  Wrench: { iconColor: 'text-slate-700', bg: 'bg-slate-100' },
+  ClipboardCheck: { iconColor: 'text-cyan-600', bg: 'bg-cyan-50' },
+  Truck: { iconColor: 'text-red-600', bg: 'bg-red-50' },
 };
 
 export default function CategoriesPage() {
-  const { t, isTelugu } = useLanguage();
+  const { isTelugu } = useLanguage();
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [search, setSearch] = useState('');
 
   const filteredCategories = useMemo(() => {
-    if (!searchTerm.trim()) return MOCK_CATEGORIES;
-    const q = searchTerm.toLowerCase();
-    return MOCK_CATEGORIES.filter(
-      (c) => c.name.toLowerCase().includes(q) || c.teluguName.includes(q) || c.description.toLowerCase().includes(q)
+    if (!search.trim()) return MOCK_CATEGORIES;
+    const q = search.toLowerCase();
+    return MOCK_CATEGORIES.filter((c) =>
+      c.name.toLowerCase().includes(q) ||
+      c.teluguName.includes(q) ||
+      c.description.toLowerCase().includes(q) ||
+      c.popularServices.some((p) => p.toLowerCase().includes(q))
     );
-  }, [searchTerm]);
+  }, [search]);
 
   return (
-    <div className="bg-surface-bg pb-10 pt-4 sm:pt-6">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        
-        {/* Top Header with Back button and Search input matching Scazo Screen 04 */}
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="p-3 rounded-2xl bg-white border border-slate-200 text-slate-700 hover:text-primary transition-colors shrink-0 shadow-sm"
-            title="Go back"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-
-          <div className="relative flex-1">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={isTelugu ? 'సేవలను వెతకండి (Search for services)...' : 'Search for services...'}
-              className="w-full h-13 pl-4 pr-10 text-sm sm:text-base font-semibold bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-sm"
-            />
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
+    <div className="bg-surface-bg min-h-screen pb-16">
+      
+      {/* Top Header */}
+      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-4 py-3.5 shadow-xs">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="p-2 -ml-1 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors"
+              title="Back"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div>
+              <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                {isTelugu ? 'అన్ని వాహన సేవా విభాగాలు' : 'All Vehicle Service Categories'}
+              </h1>
+              <span className="text-[11px] text-slate-500">
+                12 Certified Automotive Categories
+              </span>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Section Heading */}
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            {isTelugu ? 'అన్ని సేవా కేటగిరీలు' : 'All Service Categories'}
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            {isTelugu ? `${filteredCategories.length} సేవా విభాగాలు అందుబాటులో ఉన్నాయి` : `${filteredCategories.length} categories available across Andhra Pradesh villages`}
-          </p>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-5">
+        
+        {/* Search Input */}
+        <div className="relative mb-6">
+          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={isTelugu ? 'ఆయిల్ చేంజ్, వాటర్ వాష్, టైర్లు, బ్రేకులు వెతకండి...' : 'Search oil change, water wash, tyres, brakes...'}
+            className="w-full pl-11 pr-10 py-3 bg-white border border-slate-200/90 rounded-2xl text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-xs"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
-        {/* 3-column / 4-column Pastel Cards Grid matching Screen 04 */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mb-12">
+        {/* 2-Column Responsive Category Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
           {filteredCategories.map((cat) => {
             const Icon = iconMap[cat.icon] || Wrench;
-            const iconStyle = categoryIconColors[cat.icon] || { iconColor: 'text-primary', bg: 'bg-primary/10' };
+            const style = categoryIconColors[cat.icon] || {
+              iconColor: 'text-primary',
+              bg: 'bg-blue-50',
+            };
 
             return (
               <Link
                 key={cat.id}
                 href={`/services?cat=${cat.slug}`}
-                className={`p-4 sm:p-5 rounded-3xl border transition-all duration-300 flex flex-col justify-between group hover:scale-[1.03] hover:shadow-card min-h-[150px] ${cat.bgTint || 'bg-slate-50 border-slate-200 text-slate-800'}`}
+                className="p-4 sm:p-5 rounded-3xl bg-white border border-slate-200/90 hover:border-primary/40 shadow-xs hover:shadow-card transition-all duration-300 flex items-start gap-4 group hover:-translate-y-0.5"
               >
-                {/* Colorful Rounded Icon Badge on Top Left matching Screen 04 */}
-                <div className={`w-12 h-12 rounded-2xl bg-white shadow-xs border border-white/60 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <Icon className={`w-6 h-6 stroke-[2.2px] ${iconStyle.iconColor}`} />
+                <div className={`w-13 h-13 sm:w-14 sm:h-14 rounded-2xl ${style.bg} ${style.iconColor} flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform`}>
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.2px]" />
                 </div>
 
-                <div>
-                  <h3 className="font-extrabold text-sm sm:text-base tracking-tight leading-snug">
-                    {isTelugu ? cat.teluguName : cat.name}
-                  </h3>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1 mb-1">
+                    <h3 className="font-extrabold text-sm sm:text-base text-slate-900 group-hover:text-primary transition-colors truncate">
+                      {isTelugu ? cat.teluguName : cat.name}
+                    </h3>
+                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+                  </div>
+
+                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-2.5">
+                    {isTelugu ? cat.teluguDescription : cat.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-1">
+                    {cat.popularServices.slice(0, 2).map((pop, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-0.5 rounded-md bg-slate-50 text-[10px] font-bold text-slate-600 border border-slate-200/60"
+                      >
+                        {pop}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </Link>
             );

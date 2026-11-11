@@ -55,6 +55,7 @@ export default function ProviderDashboardPage() {
     id: string;
     customerName: string;
     serviceRequested: string;
+    vehicleDetails?: string;
   } | null>(null);
 
   const filteredBookings = myBookings.filter((b) => {
@@ -375,6 +376,12 @@ export default function ProviderDashboardPage() {
                         <p className="text-slate-700 italic">
                           "{b.message}"
                         </p>
+                        {b.vehicleDetails && (
+                          <p className="text-slate-800 text-xs font-bold flex items-center gap-1.5 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200/80">
+                            <span className="text-amber-800">Vehicle:</span>
+                            <span>{b.vehicleDetails}</span>
+                          </p>
+                        )}
                         {b.preferredTime && (
                           <p className="text-slate-500 font-medium text-xs flex items-center gap-1">
                             <Clock className="w-3.5 h-3.5 text-slate-400" />
@@ -467,6 +474,7 @@ export default function ProviderDashboardPage() {
                                   id: b.id,
                                   customerName: b.customerName,
                                   serviceRequested: b.serviceRequested,
+                                  vehicleDetails: b.vehicleDetails,
                                 })
                               }
                               className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-xs transition-colors flex items-center gap-1"
@@ -485,6 +493,7 @@ export default function ProviderDashboardPage() {
                                 id: b.id,
                                 customerName: b.customerName,
                                 serviceRequested: b.serviceRequested,
+                                vehicleDetails: b.vehicleDetails,
                               })
                             }
                             className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-xs transition-colors flex items-center gap-1 animate-pulse"
@@ -596,6 +605,7 @@ export default function ProviderDashboardPage() {
           bookingId={completeModalTarget.id}
           customerName={completeModalTarget.customerName}
           serviceRequested={completeModalTarget.serviceRequested}
+          vehicleDetails={completeModalTarget.vehicleDetails}
         />
       )}
 

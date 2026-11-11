@@ -24,16 +24,41 @@ import {
   Layers,
   ChevronRight,
   Filter,
+  Gift,
+  Award,
+  CheckCircle2,
+  Clock,
+  ShieldCheck,
+  FileText,
+  Sparkles,
+  PackageCheck,
+  Check,
 } from 'lucide-react';
 
 export default function SuperAdminDashboardPage() {
   const { t, isTelugu } = useLanguage();
   const { villages } = useLocation();
-  const { enquiries, providers, businesses, properties } = useMarketplace();
+  const {
+    enquiries,
+    providers,
+    businesses,
+    properties,
+    rewardConfig,
+    rewardDefinitions,
+    rewardAuditLogs,
+    updateRewardConfig,
+    updateRewardDefinition,
+    showToast,
+  } = useMarketplace();
 
   const [selectedVillageScope, setSelectedVillageScope] = useState<string>('all');
-  const [activeTab, setActiveTab] = useState<'overview' | 'villages' | 'categories' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'villages' | 'categories' | 'rewards_config'>('overview');
   const [showAddVillageModal, setShowAddVillageModal] = useState(false);
+
+  // Reward Config Form State
+  const [servicesThreshold, setServicesThreshold] = useState(rewardConfig?.servicesRequiredCount || 10);
+  const [resetDay, setResetDay] = useState(rewardConfig?.resetDayOfMonth || 1);
+  const [loyaltyEnabled, setLoyaltyEnabled] = useState(rewardConfig?.enabled ?? true);
 
   // New Village form state
   const [newVillageName, setNewVillageName] = useState('');
@@ -248,6 +273,22 @@ export default function SuperAdminDashboardPage() {
             <Grid className="w-4 h-4" />
             <span>{t('dashboards.superAdmin.globalCategories')}</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('rewards_config')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 ${
+              activeTab === 'rewards_config'
+                ? 'bg-amber-500 text-slate-950 shadow-sm font-black'
+                : 'text-slate-700 hover:text-slate-900'
+            }`}
+          >
+            <Gift className="w-4 h-4 text-amber-600" />
+            <span>Loyalty Rewards & Audits</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-300 text-slate-950 font-black">
+              {rewardConfig?.servicesRequiredCount || 10} Services
+            </span>
+          </button>
         </div>
 
         {/* Tab 1: Village Comparison Table */}
@@ -420,6 +461,221 @@ export default function SuperAdminDashboardPage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Tab 4: Loyalty Rewards Engine & Statewide Audits */}
+        {activeTab === 'rewards_config' && (
+          <div className="space-y-6">
+            
+            {/* Global Engine Configuration Form */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-400 text-slate-950">
+                      Master Loyalty Engine Policy
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                      Statewide Active
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-extrabold text-slate-900 mt-2">
+                    Monthly 10 Services Loyalty Reward Rules
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+                    Controls customer eligibility thresholds, monthly calendar reset schedules, and mandatory provider confirmation rules.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    updateRewardConfig({
+                      servicesRequiredCount: Number(servicesThreshold),
+                      resetDayOfMonth: Number(resetDay),
+                      enabled: loyaltyEnabled,
+                    });
+                    showToast('success', 'Policy Updated', 'Master Loyalty Policy configuration updated successfully!');
+                  }}
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black rounded-xl shadow-xs transition-colors shrink-0 flex items-center gap-2"
+                >
+                  <Check className="w-4 h-4 text-emerald-400" />
+                  <span>Save Engine Settings</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    Services Required Count per Month
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={50}
+                    value={servicesThreshold}
+                    onChange={(e) => setServicesThreshold(Number(e.target.value))}
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1.5">
+                    Customers must complete exactly this number of verified services within a calendar month to claim.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    Monthly Reset Calendar Day
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={28}
+                    value={resetDay}
+                    onChange={(e) => setResetDay(Number(e.target.value))}
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1.5">
+                    Day 1 of every month resets counts back to 0 while archiving prior vouchers.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    Program Status
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setLoyaltyEnabled(!loyaltyEnabled)}
+                    className={`w-full p-3 rounded-xl border text-sm font-black transition-all flex items-center justify-between ${
+                      loyaltyEnabled
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                        : 'bg-rose-50 border-rose-300 text-rose-800'
+                    }`}
+                  >
+                    <span>{loyaltyEnabled ? 'Active & Enforcing' : 'Program Paused'}</span>
+                    <span className={`w-3 h-3 rounded-full ${loyaltyEnabled ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                  </button>
+                  <p className="text-[11px] text-slate-400 mt-1.5">
+                    Strict audit enforces: Provider Confirmation checkbox = true, and actualAmount &gt; 0.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Rewards Catalog & Allocation */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card">
+              <h3 className="text-lg font-black text-slate-900 mb-1 flex items-center gap-2">
+                <Gift className="w-5 h-5 text-amber-500" />
+                <span>Rewards Catalog & Partner Workshop Fulfillment Inventory</span>
+              </h3>
+              <p className="text-xs text-slate-500 mb-6">
+                Active loyalty catalog offerings unlocked once 10 completed automotive services are verified.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {rewardDefinitions.map((reward) => (
+                  <div
+                    key={reward.id}
+                    className="p-5 rounded-3xl border border-slate-200 bg-slate-50/70 flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-3xl">{reward.icon}</span>
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-black ${
+                          reward.active ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                        }`}>
+                          {reward.active ? 'Active' : 'Disabled'}
+                        </span>
+                      </div>
+                      <h4 className="text-base font-black text-slate-900">{isTelugu ? reward.teluguName : reward.name}</h4>
+                      <p className="text-xs text-slate-600 mt-1">{isTelugu ? reward.teluguDescription : reward.description}</p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-slate-200 text-xs space-y-2">
+                      <div className="flex justify-between font-bold">
+                        <span className="text-slate-500">Retail Value:</span>
+                        <span className="text-slate-900">₹{reward.retailValue}</span>
+                      </div>
+                      <div className="flex justify-between font-bold">
+                        <span className="text-slate-500">Voucher Validity:</span>
+                        <span className="text-slate-900">60 Days</span>
+                      </div>
+                      <div className="flex justify-between font-bold">
+                        <span className="text-slate-500">Workshop Stock:</span>
+                        <span className="text-emerald-700 font-black">{reward.inventoryCount} Units</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateRewardDefinition(reward.id, { active: !reward.active });
+                          showToast('info', 'Reward Status', `Toggled "${reward.name}" ${!reward.active ? 'Active' : 'Inactive'}`);
+                        }}
+                        className="w-full mt-2 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-800 text-xs font-bold transition-colors"
+                      >
+                        {reward.active ? 'Disable Reward' : 'Enable Reward'}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Audit Trail Log */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-card">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-indigo-600" />
+                    <span>Real-Time Statewide Loyalty Audit Trail</span>
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Immutable event log capturing all claim creations, admin approvals, rejections, and redemptions.
+                  </p>
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  {rewardAuditLogs.length} Events Logged
+                </span>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase tracking-wider bg-slate-50/60">
+                      <th className="py-2.5 px-3">Timestamp</th>
+                      <th className="py-2.5 px-3">Event Action</th>
+                      <th className="py-2.5 px-3">Claim ID</th>
+                      <th className="py-2.5 px-3">Actor / Admin</th>
+                      <th className="py-2.5 px-3">Audit Details</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                    {rewardAuditLogs.map((log) => (
+                      <tr key={log.id} className="hover:bg-slate-50">
+                        <td className="py-3 px-3 font-mono text-slate-500">{log.timestamp}</td>
+                        <td className="py-3 px-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                            log.action === 'CLAIM_APPROVED'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : log.action === 'REWARD_REDEEMED'
+                              ? 'bg-blue-100 text-blue-800'
+                              : log.action === 'CLAIM_REJECTED'
+                              ? 'bg-rose-100 text-rose-800'
+                              : 'bg-amber-100 text-amber-900'
+                          }`}>
+                            {log.action.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 font-mono font-bold text-slate-800">{log.claimId || '—'}</td>
+                        <td className="py-3 px-3 font-bold text-slate-900">{log.actor}</td>
+                        <td className="py-3 px-3 text-slate-600 max-w-xs truncate">{log.details}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
         )}
 

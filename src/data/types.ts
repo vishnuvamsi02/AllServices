@@ -181,6 +181,127 @@ export interface Enquiry {
   reviewSubmitted?: boolean;
   rating?: number;
   reviewComment?: string;
+  vehicleId?: string;
+  vehicleDetails?: string;
+  completionConfirmedByProvider?: boolean;
+  completionNotes?: string;
+  eligibleForReward?: boolean;
+}
+
+export interface CustomerVehicle {
+  id: string;
+  customerId: string;
+  make: string;
+  model: string;
+  type: 'bike' | 'car' | 'commercial';
+  year: number;
+  regNumber: string;
+  fuelType: 'petrol' | 'diesel' | 'ev' | 'cng';
+  isDefault?: boolean;
+  image?: string;
+}
+
+export interface ServiceCompletionRecord {
+  id: string;
+  bookingId: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  providerId: string;
+  providerName: string;
+  serviceId: string;
+  serviceName: string;
+  vehicleDetails: string;
+  actualAmount: number;
+  completionNotes: string;
+  providerConfirmation: boolean;
+  completedAt: string;
+  month: number;
+  year: number;
+  status: 'verified' | 'disputed' | 'refunded';
+}
+
+export interface RewardDefinition {
+  id: string;
+  name: string;
+  teluguName: string;
+  description: string;
+  teluguDescription: string;
+  retailValue: number;
+  icon: string;
+  badge: string;
+  active: boolean;
+  inventoryCount: number;
+}
+
+export interface RewardClaim {
+  id: string;
+  uniqueClaimId: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  month: number;
+  year: number;
+  rewardId: string;
+  rewardName: string;
+  rewardTitle?: string;
+  status: 'pending_admin_approval' | 'approved' | 'rejected' | 'redeemed';
+  requestedAt: string;
+  claimedAt?: string;
+  approvedBy?: string;
+  approvedAt?: string;
+  rejectedReason?: string;
+  rejectionReason?: string;
+  redemptionCode?: string;
+  voucherCode?: string;
+  validUntil?: string;
+  redeemedAt?: string;
+  redeemedBy?: string;
+  fulfilledBy?: string;
+  contributingBookingsCount: number;
+  totalServiceAmount: number;
+  contributingBookingIds: string[];
+  eligibleBookingIds?: string[];
+}
+
+export interface RewardAuditLog {
+  id: string;
+  actorId?: string;
+  actorName?: string;
+  actorRole?: string;
+  actor?: string;
+  action: string;
+  entityId?: string;
+  claimId?: string;
+  previousStatus?: string;
+  newStatus?: string;
+  notes?: string;
+  details?: string;
+  timestamp: string;
+}
+
+export interface RewardSystemConfig {
+  requiredCompletedServices: number;
+  servicesRequiredCount?: number;
+  resetDayOfMonth?: number;
+  enabled?: boolean;
+  eligibilityPeriod: 'calendar_month';
+  allowedRewardIds: string[];
+  approvalRequired: boolean;
+  autoNotifyUsers: boolean;
+}
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  userRole: UserRole;
+  title: string;
+  message: string;
+  type: 'booking' | 'reward' | 'system';
+  timestamp: string;
+  read: boolean;
+  actionUrl?: string;
+  link?: string;
 }
 
 export interface SupportTicket {

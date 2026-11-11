@@ -20,6 +20,7 @@ import {
   Package,
   Layers,
   Search,
+  Gift,
 } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
@@ -191,6 +192,24 @@ export const BottomNav: React.FC = () => {
         activeGradient: 'from-blue-600 to-indigo-700',
       },
       {
+        id: 'services',
+        href: '/services',
+        labelEn: 'Services',
+        labelTe: 'సేవలు',
+        icon: Briefcase,
+        isActive: pathname.startsWith('/services'),
+        activeGradient: 'from-blue-500 to-teal-600',
+      },
+      {
+        id: 'rewards',
+        href: '/rewards',
+        labelEn: 'Rewards',
+        labelTe: 'రివార్డులు',
+        icon: Gift,
+        isActive: pathname.startsWith('/rewards'),
+        activeGradient: 'from-amber-400 to-amber-600',
+      },
+      {
         id: 'bookings',
         href: '/dashboard/customer',
         labelEn: 'Bookings',
@@ -198,15 +217,6 @@ export const BottomNav: React.FC = () => {
         icon: FileText,
         isActive: pathname === '/dashboard/customer' || pathname === '/orders',
         activeGradient: 'from-emerald-500 to-teal-600',
-      },
-      {
-        id: 'services',
-        href: '/services',
-        labelEn: 'Services',
-        labelTe: 'సేవలు',
-        icon: Briefcase,
-        isActive: pathname.startsWith('/services'),
-        activeGradient: 'from-amber-500 to-orange-600',
       },
       {
         id: 'settings',
@@ -238,6 +248,15 @@ export const BottomNav: React.FC = () => {
         icon: Briefcase,
         isActive: pathname.startsWith('/services'),
         activeGradient: 'from-emerald-500 to-teal-600',
+      },
+      {
+        id: 'rewards',
+        href: '/rewards',
+        labelEn: 'Rewards',
+        labelTe: 'రివార్డులు',
+        icon: Gift,
+        isActive: pathname.startsWith('/rewards'),
+        activeGradient: 'from-amber-400 to-amber-600',
       },
       {
         id: 'login',

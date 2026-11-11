@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { HomeMode } from '@/data/types';
 import { HeroSection } from '@/components/home/HeroSection';
 import { TopPromotionsCarousel } from '@/components/home/TopPromotionsCarousel';
+import { MonthlyRewardProgressWidget } from '@/components/home/MonthlyRewardProgressWidget';
 import { ExploreServicesSection } from '@/components/home/ExploreServicesSection';
 import { TopCategoriesGrid } from '@/components/home/TopCategoriesGrid';
 import { MarketBrandPromoCard } from '@/components/home/MarketBrandPromoCard';
@@ -30,6 +31,9 @@ export default function HomePage() {
         
         {/* Prominent Advertisement Showcase: FIRST Section Users See at Launch */}
         <TopPromotionsCarousel onOpenPostAd={() => setShowPostAdModal(true)} />
+
+        {/* 10 Completed Services Customer Loyalty Reward Tracker Banner */}
+        <MonthlyRewardProgressWidget />
 
         {/* Conditional View Based on Mode: Services vs Properties */}
         {mode === 'services' ? (

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
+import { useMarketplace } from '@/context/MarketplaceContext';
 import { LanguageSelector } from '../common/LanguageSelector';
 import { LocationSelector } from '../common/LocationSelector';
 import {
@@ -22,15 +23,21 @@ import {
   FileText,
   Settings,
   ArrowLeft,
+  Bell,
+  Gift,
+  CheckCircle2,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { t, isTelugu } = useLanguage();
   const { currentUser, role, isLoggedIn, logout } = useAuth();
+  const { notifications, markNotificationRead, markAllNotificationsRead } = useMarketplace();
+  const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   // Dedicated app screens that manage their own mobile app top bars
   if (pathname === '/' || pathname?.startsWith('/settings') || pathname === '/orders') {
@@ -56,10 +63,10 @@ export const Navbar: React.FC = () => {
   const navLinks = [
     { href: '/', label: t('nav.home'), icon: Home, color: 'text-blue-500 bg-blue-50' },
     { href: '/services', label: t('nav.services'), icon: Briefcase, color: 'text-amber-500 bg-amber-50' },
+    { href: '/rewards', label: isTelugu ? 'నెలవారీ రివార్డులు' : 'Monthly Rewards', icon: Gift, color: 'text-amber-500 bg-amber-50' },
+    { href: '/categories', label: t('nav.categories'), icon: Briefcase, color: 'text-indigo-500 bg-indigo-50' },
     { href: '/properties', label: t('nav.properties'), icon: Building2, color: 'text-emerald-500 bg-emerald-50' },
     { href: '/businesses', label: t('nav.businesses'), icon: Store, color: 'text-purple-500 bg-purple-50' },
-    { href: '/orders', label: t('nav.orders'), icon: FileText, color: 'text-teal-500 bg-teal-50' },
-    { href: '/categories', label: t('nav.categories'), icon: Briefcase, color: 'text-indigo-500 bg-indigo-50' },
     { href: '/how-it-works', label: t('nav.howItWorks'), icon: HelpCircle, color: 'text-rose-500 bg-rose-50' },
   ];
 
@@ -98,6 +105,13 @@ export const Navbar: React.FC = () => {
             {getPageTitle()}
           </h1>
           <div className="flex items-center gap-1.5">
+            <Link
+              href="/rewards"
+              className="p-2 rounded-xl text-amber-600 bg-amber-50 hover:bg-amber-100 transition-colors"
+              title="Rewards"
+            >
+              <Gift className="w-4 h-4 fill-amber-400" />
+            </Link>
             <LanguageSelector compact />
           </div>
         </div>
@@ -149,6 +163,81 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-2.5">
               <LocationSelector variant="header" />
               <LanguageSelector />
+
+              {/* In-App Notifications Bell Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setNotificationsOpen(!notificationsOpen)}
+                  className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 hover:text-primary transition-all relative"
+                  title="Notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                  {unreadNotificationsCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center animate-pulse">
+                      {unreadNotificationsCount}
+                    </span>
+                  )}
+                </button>
+
+                {notificationsOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setNotificationsOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
+                        <span className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                          Notifications ({notifications.length})
+                        </span>
+                        {unreadNotificationsCount > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => markAllNotificationsRead(currentUser?.id || 'cust_101')}
+                            className="text-[11px] font-bold text-primary hover:underline"
+                          >
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="max-h-64 overflow-y-auto space-y-2">
+                        {notifications.length === 0 ? (
+                          <p className="text-xs text-slate-400 text-center py-4">No notifications yet.</p>
+                        ) : (
+                          notifications.map((n) => (
+                            <div
+                              key={n.id}
+                              onClick={() => markNotificationRead(n.id)}
+                              className={`p-2.5 rounded-xl text-xs transition-colors cursor-pointer border ${
+                                !n.read
+                                  ? 'bg-amber-50/70 border-amber-200/80 text-slate-900'
+                                  : 'bg-slate-50 border-slate-100 text-slate-600'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-1 mb-0.5">
+                                <span className="font-black text-slate-900 text-xs">{n.title}</span>
+                                <span className="text-[10px] text-slate-400">{n.timestamp}</span>
+                              </div>
+                              <p className="text-xs text-slate-600 leading-snug">{n.message}</p>
+                              {n.link && (
+                                <Link
+                                  href={n.link}
+                                  onClick={() => setNotificationsOpen(false)}
+                                  className="text-[11px] font-bold text-primary hover:underline mt-1 inline-block"
+                                >
+                                  View Details →
+                                </Link>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
 
               <Link
                 href="/settings"
