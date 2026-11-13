@@ -201,13 +201,16 @@ export default function MonthlyRewardsPage() {
               })}
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-slate-500">
-              <span>Start: Nov 1</span>
-              <span className="flex items-center gap-1 font-bold text-slate-700">
-                <Gift className="w-3.5 h-3.5 text-amber-500" />
-                <span>10th Service Unlocks Free Reward</span>
-              </span>
-              <span>Month End: Nov 30</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-500 pt-1">
+              <div className="flex items-center justify-between sm:justify-start gap-3 text-slate-400 font-medium">
+                <span>Start: Nov 1, 2026</span>
+                <span>•</span>
+                <span>Month End: Nov 30, 2026</span>
+              </div>
+              <div className="inline-flex items-center gap-1.5 font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-200 self-start sm:self-auto">
+                <Gift className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span>10th Service Unlocks Free Reward!</span>
+              </div>
             </div>
           </div>
 

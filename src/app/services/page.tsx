@@ -150,7 +150,7 @@ function ServicesContent() {
           </div>
 
           {/* Category Horizontal Pills */}
-          <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar scrollbar-none">
             <button
               type="button"
               onClick={() => setSelectedCategory('all')}

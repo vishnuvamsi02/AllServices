@@ -35,7 +35,7 @@ export default function RootLayout({
               <MarketplaceProvider>
                 <RoleSwitcherBar />
                 <Navbar />
-                <main className="flex-1">
+                <main className="flex-1 pb-24 sm:pb-28">
                   {children}
                 </main>
                 <Footer />

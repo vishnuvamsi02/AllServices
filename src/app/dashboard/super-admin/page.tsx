@@ -1,11 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useLocation } from '@/context/LocationContext';
+import { useAuth } from '@/context/AuthContext';
 import { useMarketplace } from '@/context/MarketplaceContext';
 import { MOCK_VILLAGES, MOCK_CATEGORIES } from '@/data/mockData';
 import { Village } from '@/data/types';
+import { AnalyticsDashboardView } from '@/components/admin/AnalyticsDashboardView';
 import {
   Crown,
   Landmark,
@@ -33,11 +37,16 @@ import {
   Sparkles,
   PackageCheck,
   Check,
+  BarChart3,
+  Activity,
+  LogIn,
 } from 'lucide-react';
 
-export default function SuperAdminDashboardPage() {
+function SuperAdminDashboardContent() {
   const { t, isTelugu } = useLanguage();
   const { villages } = useLocation();
+  const { currentUser, role, isSuperAdmin, isLoggedIn, switchRole } = useAuth();
+  const searchParams = useSearchParams();
   const {
     enquiries,
     providers,
@@ -52,7 +61,15 @@ export default function SuperAdminDashboardPage() {
   } = useMarketplace();
 
   const [selectedVillageScope, setSelectedVillageScope] = useState<string>('all');
-  const [activeTab, setActiveTab] = useState<'overview' | 'villages' | 'categories' | 'rewards_config'>('overview');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'overview' | 'villages' | 'categories' | 'rewards_config'>('analytics');
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['analytics', 'overview', 'villages', 'categories', 'rewards_config'].includes(tabParam)) {
+      setActiveTab(tabParam as any);
+    }
+  }, [searchParams]);
+
   const [showAddVillageModal, setShowAddVillageModal] = useState(false);
 
   // Reward Config Form State
@@ -111,6 +128,45 @@ export default function SuperAdminDashboardPage() {
   const totalBusinesses = allVillagesList.reduce((acc, v) => acc + v.registeredCount.businesses, 0);
   const totalProperties = allVillagesList.reduce((acc, v) => acc + v.registeredCount.properties, 0);
   const totalEnquiries = allVillagesList.reduce((acc, v) => acc + v.registeredCount.enquiries, 0);
+
+  // Protected Route Access Guard for Super Admin
+  if (!isLoggedIn || role !== 'super_admin') {
+    return (
+      <div className="bg-surface-bg min-h-[75vh] flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center border border-slate-200/90 shadow-card">
+          <div className="w-16 h-16 rounded-3xl bg-amber-50 text-amber-700 flex items-center justify-center mx-auto mb-4 border border-amber-200 shadow-xs">
+            <Crown className="w-8 h-8 text-amber-600" />
+          </div>
+          <h2 className="text-xl font-black text-slate-900">
+            {isTelugu ? 'రాష్ట్ర సూపర్ అడ్మిన్ లాగిన్ అవసరం' : 'Restricted State Command Portal'}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+            {isTelugu
+              ? 'ఈ విభాగాన్ని ఉపయోగించడానికి ఆంధ్రప్రదేశ్ రాష్ట్ర స్థాయి సూపర్ అడ్మిన్ ఆధారాలతో లాగిన్ అవ్వాలి.'
+              : 'This console is strictly restricted to authorized Andhra Pradesh State Directorate administrators. Please authenticate with 2FA.'}
+          </p>
+
+          <div className="pt-6 space-y-2.5">
+            <Link
+              href="/admin/login?role=super_admin"
+              className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-amber-400 text-xs font-black rounded-xl shadow-md transition-colors flex items-center justify-center gap-2 border border-amber-400/30"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>{isTelugu ? 'సూపర్ అడ్మిన్ లాగిన్ పేజీకి వెళ్లండి' : 'Log In to Super Admin Console'}</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => switchRole('super_admin')}
+              className="w-full py-2.5 px-4 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold rounded-xl transition-colors border border-amber-200"
+            >
+              ⚡ Instant Demo Super Admin Access
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-surface-bg pb-10 pt-4 sm:pt-6">
@@ -234,13 +290,26 @@ export default function SuperAdminDashboardPage() {
         </div>
 
         {/* Navigation Tabs for Super Admin */}
-        <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-slate-200/90 shadow-sm mb-8 overflow-x-auto">
+        <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-slate-200/90 shadow-sm mb-8 overflow-x-auto no-scrollbar scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setActiveTab('analytics')}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 ${
+              activeTab === 'analytics'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-sm font-black'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4 text-emerald-300" />
+            <span>State Analytics & Growth</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveTab('overview')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 ${
               activeTab === 'overview'
-                ? 'bg-purple-900 text-white shadow-sm'
+                ? 'bg-purple-900 text-white shadow-sm font-black'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -253,7 +322,7 @@ export default function SuperAdminDashboardPage() {
             onClick={() => setActiveTab('villages')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 ${
               activeTab === 'villages'
-                ? 'bg-purple-900 text-white shadow-sm'
+                ? 'bg-purple-900 text-white shadow-sm font-black'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -266,7 +335,7 @@ export default function SuperAdminDashboardPage() {
             onClick={() => setActiveTab('categories')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 ${
               activeTab === 'categories'
-                ? 'bg-purple-900 text-white shadow-sm'
+                ? 'bg-purple-900 text-white shadow-sm font-black'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -290,6 +359,14 @@ export default function SuperAdminDashboardPage() {
             </span>
           </button>
         </div>
+
+        {/* Tab 0: Statewide Analytics & Performance Tracking */}
+        {activeTab === 'analytics' && (
+          <AnalyticsDashboardView
+            isSuperAdmin={true}
+            initialVillageScope={selectedVillageScope}
+          />
+        )}
 
         {/* Tab 1: Village Comparison Table */}
         {activeTab === 'overview' && (
@@ -787,3 +864,18 @@ export default function SuperAdminDashboardPage() {
     </div>
   );
 }
+
+export default function SuperAdminDashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-surface-bg flex items-center justify-center p-4 text-xs font-bold text-slate-500">
+          Loading Super Admin Console...
+        </div>
+      }
+    >
+      <SuperAdminDashboardContent />
+    </Suspense>
+  );
+}
+

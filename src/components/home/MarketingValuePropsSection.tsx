@@ -202,7 +202,7 @@ export const MarketingValuePropsSection: React.FC = () => {
       </div>
 
       {/* 5 Interactive Value Pillar Buttons */}
-      <div className="relative z-10 flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none">
+      <div className="relative z-10 flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar scrollbar-none">
         {pillars.map((pillar, idx) => {
           const Icon = pillar.icon;
           const isSelected = activePillar === idx;

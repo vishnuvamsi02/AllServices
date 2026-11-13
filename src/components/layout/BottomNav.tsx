@@ -21,6 +21,9 @@ import {
   Layers,
   Search,
   Gift,
+  BarChart3,
+  TrendingUp,
+  HelpCircle,
 } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
@@ -127,17 +130,26 @@ export const BottomNav: React.FC = () => {
         labelEn: 'Admin Hub',
         labelTe: 'గ్రామ హబ్',
         icon: Landmark,
-        isActive: pathname === '/dashboard/village-admin',
+        isActive: pathname === '/dashboard/village-admin' && !pathname.includes('tab=analytics'),
         activeGradient: 'from-indigo-600 to-blue-700',
       },
       {
-        id: 'services',
-        href: '/services',
-        labelEn: 'Directory',
-        labelTe: 'డైరెక్టరీ',
-        icon: Layers,
-        isActive: pathname.startsWith('/services') || pathname.startsWith('/categories'),
+        id: 'admin_analytics',
+        href: '/dashboard/village-admin?tab=analytics',
+        labelEn: 'Analytics',
+        labelTe: 'విశ్లేషణలు',
+        icon: BarChart3,
+        isActive: pathname.includes('tab=analytics'),
         activeGradient: 'from-emerald-500 to-teal-600',
+      },
+      {
+        id: 'admin_support',
+        href: '/dashboard/village-admin?tab=support',
+        labelEn: 'Support',
+        labelTe: 'ఫిర్యాదులు',
+        icon: HelpCircle,
+        isActive: pathname.includes('tab=support'),
+        activeGradient: 'from-rose-500 to-pink-600',
       },
       {
         id: 'settings',
@@ -157,17 +169,26 @@ export const BottomNav: React.FC = () => {
         labelEn: 'State Hub',
         labelTe: 'రాష్ట్ర హబ్',
         icon: Crown,
-        isActive: pathname === '/dashboard/super-admin',
+        isActive: pathname === '/dashboard/super-admin' && !pathname.includes('tab=analytics'),
         activeGradient: 'from-purple-600 to-pink-600',
       },
       {
-        id: 'services',
-        href: '/services',
-        labelEn: 'Directory',
-        labelTe: 'డైరెక్టరీ',
-        icon: Layers,
-        isActive: pathname.startsWith('/services'),
-        activeGradient: 'from-blue-500 to-indigo-600',
+        id: 'super_analytics',
+        href: '/dashboard/super-admin?tab=analytics',
+        labelEn: 'Analytics',
+        labelTe: 'విశ్లేషణలు',
+        icon: BarChart3,
+        isActive: pathname.includes('tab=analytics'),
+        activeGradient: 'from-emerald-500 to-teal-600',
+      },
+      {
+        id: 'rewards_config',
+        href: '/dashboard/super-admin?tab=rewards_config',
+        labelEn: 'Rewards',
+        labelTe: 'రివార్డులు',
+        icon: Gift,
+        isActive: pathname.includes('tab=rewards_config'),
+        activeGradient: 'from-amber-500 to-orange-600',
       },
       {
         id: 'settings',
@@ -281,7 +302,7 @@ export const BottomNav: React.FC = () => {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none flex justify-center px-3"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-40 pointer-events-none flex justify-center px-3"
       style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}
     >
       <nav className="pointer-events-auto w-full max-w-md bg-slate-900/95 text-white shadow-2xl px-3 py-2 flex items-center justify-around border border-white/15 rounded-2xl backdrop-blur-xl">

@@ -235,7 +235,7 @@ export default function ProviderDashboardPage() {
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-slate-200/90 text-xs font-bold overflow-x-auto">
+            <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-slate-200/90 text-xs font-bold overflow-x-auto no-scrollbar scrollbar-none">
               <button
                 type="button"
                 onClick={() => setBookingTab('all')}

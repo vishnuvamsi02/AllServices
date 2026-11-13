@@ -1,11 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { useMarketplace } from '@/context/MarketplaceContext';
 import { MOCK_VILLAGES } from '@/data/mockData';
 import { RewardClaim, SupportTicket } from '@/data/types';
+import { AnalyticsDashboardView } from '@/components/admin/AnalyticsDashboardView';
 import {
   Landmark,
   ShieldCheck,
@@ -38,11 +41,15 @@ import {
   AlertTriangle,
   Flame,
   CheckSquare,
+  BarChart3,
+  TrendingUp,
+  LogIn,
 } from 'lucide-react';
 
-export default function VillageAdminDashboardPage() {
+function VillageAdminDashboardContent() {
   const { t, isTelugu } = useLanguage();
-  const { currentUser } = useAuth();
+  const { currentUser, role, isLoggedIn, switchRole } = useAuth();
+  const searchParams = useSearchParams();
   const {
     pendingApprovals,
     approvePendingItem,
@@ -57,12 +64,19 @@ export default function VillageAdminDashboardPage() {
     updateSupportTicket,
   } = useMarketplace();
 
+  // Active admin tab
+  const [adminTab, setAdminTab] = useState<'rewards' | 'approvals' | 'enquiries' | 'support' | 'analytics'>('rewards');
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['rewards', 'approvals', 'enquiries', 'support', 'analytics'].includes(tabParam)) {
+      setAdminTab(tabParam as any);
+    }
+  }, [searchParams]);
+
   // Strict village data isolation: Derives village from logged in admin's account
   const assignedVillageId = currentUser?.villageId || 'v_kaza';
   const village = MOCK_VILLAGES.find((v) => v.id === assignedVillageId) || MOCK_VILLAGES[0];
-
-  // Active admin tab
-  const [adminTab, setAdminTab] = useState<'rewards' | 'approvals' | 'enquiries' | 'support'>('rewards');
   const [rewardFilter, setRewardFilter] = useState<'all' | 'pending_admin_approval' | 'approved' | 'redeemed'>('all');
 
   // Support tickets filter & resolution modal state
@@ -192,6 +206,45 @@ export default function VillageAdminDashboardPage() {
     }
   };
 
+  // Protected Route Access Guard
+  if (!isLoggedIn || (role !== 'village_admin' && role !== 'super_admin')) {
+    return (
+      <div className="bg-surface-bg min-h-[75vh] flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center border border-slate-200/90 shadow-card">
+          <div className="w-16 h-16 rounded-3xl bg-indigo-50 text-indigo-700 flex items-center justify-center mx-auto mb-4 border border-indigo-100 shadow-xs">
+            <Landmark className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-black text-slate-900">
+            {isTelugu ? 'గ్రామ అడ్మిన్ లాగిన్ అవసరం' : 'Restricted Village Admin Portal'}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+            {isTelugu
+              ? 'ఈ విభాగాన్ని ఉపయోగించడానికి అధికారిక గ్రామ పంచాయతీ అడ్మిన్ ఖాతాతో లాగిన్ అవ్వాలి.'
+              : 'This area is restricted to authorized Grama Panchayat officers. Please log in with your official administrator credentials.'}
+          </p>
+
+          <div className="pt-6 space-y-2.5">
+            <Link
+              href="/admin/login?role=village_admin"
+              className="w-full py-3 px-4 bg-primary hover:bg-primary-hover text-white text-xs font-black rounded-xl shadow-md transition-colors flex items-center justify-center gap-2"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>{isTelugu ? 'అడ్మిన్ లాగిన్ పేజీకి వెళ్లండి' : 'Log In to Village Admin Portal'}</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => switchRole('village_admin')}
+              className="w-full py-2.5 px-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-900 text-xs font-bold rounded-xl transition-colors border border-indigo-200"
+            >
+              ⚡ Instant Demo Village Admin Access
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-surface-bg pb-16 pt-4 sm:pt-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -309,7 +362,7 @@ export default function VillageAdminDashboardPage() {
         </div>
 
         {/* Dashboard Navigation Tabs */}
-        <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-slate-200/90 shadow-xs mb-6 overflow-x-auto">
+        <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border border-slate-200/90 shadow-xs mb-6 overflow-x-auto no-scrollbar scrollbar-none">
           <button
             type="button"
             onClick={() => setAdminTab('rewards')}
@@ -366,6 +419,19 @@ export default function VillageAdminDashboardPage() {
             {supportTickets.some((t) => t.status === 'submitted' || t.priority === 'urgent') && (
               <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
             )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setAdminTab('analytics')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 ${
+              adminTab === 'analytics'
+                ? 'bg-emerald-600 text-white shadow-xs font-black'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Village Analytics & Growth</span>
           </button>
         </div>
 
@@ -976,6 +1042,14 @@ export default function VillageAdminDashboardPage() {
           </div>
         )}
 
+        {/* TAB 5: VILLAGE ANALYTICS & GROWTH ENGINE */}
+        {adminTab === 'analytics' && (
+          <AnalyticsDashboardView
+            initialVillageScope={village.id}
+            isSuperAdmin={false}
+          />
+        )}
+
       </div>
 
       {/* INSPECT 10 CONTRIBUTING SERVICES MODAL */}
@@ -1269,5 +1343,19 @@ export default function VillageAdminDashboardPage() {
       )}
 
     </div>
+  );
+}
+
+export default function VillageAdminDashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-surface-bg flex items-center justify-center p-4 text-xs font-bold text-slate-500">
+          Loading Village Admin Console...
+        </div>
+      }
+    >
+      <VillageAdminDashboardContent />
+    </Suspense>
   );
 }

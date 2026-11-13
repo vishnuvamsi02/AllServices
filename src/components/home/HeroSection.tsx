@@ -243,21 +243,28 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ mode, onModeChange }) 
         </div>
 
         {/* Personalized Welcome Banner */}
-        <div className="mb-4 flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-slate-900 text-sm">
-              Hello, {customerName} 👋
-            </span>
-            <span className="text-slate-500 hidden sm:inline">
-              | Your vehicle care platform • Complete 10 services to earn free rewards!
-            </span>
+        <div className="mb-4 flex flex-col xs:flex-row xs:items-center justify-between gap-2 bg-white/70 backdrop-blur-xs p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary font-black text-xs flex items-center justify-center shrink-0">
+              {customerName.charAt(0)}
+            </div>
+            <div className="truncate">
+              <span className="font-extrabold text-slate-900 text-xs sm:text-sm block truncate">
+                Namaskaram, {customerName} 👋
+              </span>
+              <span className="text-[10px] text-slate-500 hidden xs:block">
+                {isTelugu ? 'మీ గ్రామ సేవా వేదిక' : 'Your Rural AP Vehicle Platform'}
+              </span>
+            </div>
           </div>
 
           <Link
             href="/rewards"
-            className="text-amber-700 font-extrabold hover:underline flex items-center gap-1 shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 font-extrabold text-[11px] shrink-0 transition-colors shadow-xs"
           >
-            <span>7/10 Services Completed (70%)</span>
+            <Gift className="w-3.5 h-3.5 text-amber-600 fill-amber-400" />
+            <span>7/10 Services (70%)</span>
+            <span className="text-amber-700 font-black">🏆</span>
           </Link>
         </div>
 

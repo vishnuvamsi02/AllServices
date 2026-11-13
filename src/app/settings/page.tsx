@@ -260,6 +260,39 @@ export default function SettingsPage() {
           </div>
         )}
 
+        {/* Administrator Portal Access Card */}
+        <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-4 sm:p-5 shadow-lg border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shrink-0">
+              <ShieldCheck className="w-6 h-6 text-slate-950" />
+            </div>
+            <div>
+              <span className="text-xs font-black block text-amber-300">
+                {isTelugu ? 'అధికారిక అడ్మినిస్ట్రేటర్ పోర్టల్' : 'Administrator Command & Analytics'}
+              </span>
+              <p className="text-[11px] text-slate-300 leading-snug">
+                {isTelugu ? 'గ్రామ పంచాయతీ & రాష్ట్ర స్థాయి సూపర్ అడ్మిన్ లాగిన్ మరియు విశ్లేషణలు' : 'Access Village Admin, Super Admin console, and real-time analytics'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/admin/analytics"
+              className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors"
+            >
+              Analytics 📊
+            </Link>
+            <Link
+              href="/admin/login"
+              className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black shadow-xs transition-colors flex items-center gap-1"
+            >
+              <span>Admin Login</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+
         {/* Menu Items List matching Scazo Screen 01 / 02 / 03 */}
         <div className="bg-white rounded-3xl border border-slate-200/90 shadow-card overflow-hidden divide-y divide-slate-100">
           {menuItems.map((item) => {

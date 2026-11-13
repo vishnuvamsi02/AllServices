@@ -8,7 +8,19 @@ interface AuthContextType {
   currentUser: AppUser | null;
   role: UserRole;
   isLoggedIn: boolean;
+  isAdmin: boolean;
+  isVillageAdmin: boolean;
+  isSuperAdmin: boolean;
   login: (phone: string, role?: UserRole, villageId?: string) => void;
+  adminLogin: (
+    role: 'village_admin' | 'super_admin',
+    credentials: {
+      villageId?: string;
+      phoneOrEmail?: string;
+      passkeyOrPin?: string;
+      totpToken?: string;
+    }
+  ) => { success: boolean; error?: string };
   logout: () => void;
   switchRole: (role: UserRole) => void;
 }
@@ -112,6 +124,70 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const adminLogin = (
+    adminRole: 'village_admin' | 'super_admin',
+    credentials: {
+      villageId?: string;
+      phoneOrEmail?: string;
+      passkeyOrPin?: string;
+      totpToken?: string;
+    }
+  ): { success: boolean; error?: string } => {
+    if (adminRole === 'village_admin') {
+      const targetVillage = credentials.villageId || 'v_kaza';
+      const villageName =
+        targetVillage === 'v_chinchinaada'
+          ? 'Chinchinaada'
+          : targetVillage === 'v_palakollu_rural'
+          ? 'Palakollu'
+          : targetVillage === 'v_bhimavaram_rural'
+          ? 'Bhimavaram'
+          : 'Kaza';
+
+      const user: AppUser = {
+        id: `v_admin_${targetVillage}`,
+        name:
+          targetVillage === 'v_chinchinaada'
+            ? 'V. Rambabu Naidu (Chinchinaada Admin)'
+            : 'Chalasani Venkateswara Rao (Kaza Admin)',
+        phone: credentials.phoneOrEmail || '9848011223',
+        role: 'village_admin',
+        villageId: targetVillage,
+        villageName,
+        languagePreference: 'en',
+      };
+
+      setCurrentUser(user);
+      try {
+        localStorage.setItem('gramaseva_current_user', JSON.stringify(user));
+      } catch (e) {
+        console.warn('Storage save failed', e);
+      }
+      return { success: true };
+    }
+
+    if (adminRole === 'super_admin') {
+      const user: AppUser = {
+        id: 'super_admin_ap',
+        name: 'Andhra Pradesh State Admin Director',
+        phone: '9900112233',
+        email: credentials.phoneOrEmail || 'admin@sevasetu.ap.gov.in',
+        role: 'super_admin',
+        languagePreference: 'en',
+      };
+
+      setCurrentUser(user);
+      try {
+        localStorage.setItem('gramaseva_current_user', JSON.stringify(user));
+      } catch (e) {
+        console.warn('Storage save failed', e);
+      }
+      return { success: true };
+    }
+
+    return { success: false, error: 'Invalid admin role' };
+  };
+
   const logout = () => {
     setCurrentUser(null);
     try {
@@ -140,6 +216,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const role = currentUser?.role || 'guest';
   const isLoggedIn = currentUser !== null && role !== 'guest';
+  const isVillageAdmin = role === 'village_admin';
+  const isSuperAdmin = role === 'super_admin';
+  const isAdmin = isVillageAdmin || isSuperAdmin;
 
   return (
     <AuthContext.Provider
@@ -147,7 +226,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         currentUser,
         role,
         isLoggedIn,
+        isAdmin,
+        isVillageAdmin,
+        isSuperAdmin,
         login,
+        adminLogin,
         logout,
         switchRole,
       }}

@@ -26,18 +26,47 @@ button, a, input, select, textarea {
   touch-action: manipulation;
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Hide scrollbars for clean mobile app feel */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+  width: 0 !important;
+  height: 0 !important;
 }
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
+
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 9999px;
+
+/* Hide horizontal scrollbars on mobile pills and tab bars */
+@media (max-width: 768px) {
+  .overflow-x-auto::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+  .overflow-x-auto {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+
+/* Custom vertical scrollbars for desktop */
+@media (min-width: 769px) {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
 }

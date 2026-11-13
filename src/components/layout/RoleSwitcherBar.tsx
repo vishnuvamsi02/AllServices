@@ -41,23 +41,23 @@ export const RoleSwitcherBar: React.FC = () => {
 
   return (
     <div className="bg-slate-900 text-white text-xs border-b border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-1.5 sm:py-2 flex items-center justify-between gap-2 overflow-x-auto no-scrollbar scrollbar-none">
+        <div className="flex items-center gap-2 shrink-0">
           <span className="flex h-2 w-2 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span className="font-semibold text-slate-300">
-            {isTelugu ? 'పాత్ర మార్పు (లైవ్ ప్రివ్యూ):' : 'Interactive Role Switcher:'}
+          <span className="font-semibold text-slate-300 text-[11px] sm:text-xs whitespace-nowrap">
+            {isTelugu ? 'పాత్ర మార్పు:' : 'Role Switcher:'}
           </span>
           {currentUser?.villageName && role === 'village_admin' && (
-            <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-mono text-[11px] border border-indigo-500/30">
-              Village: {currentUser.villageName}
+            <span className="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-mono text-[10px] sm:text-[11px] border border-indigo-500/30 whitespace-nowrap">
+              {currentUser.villageName}
             </span>
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex items-center gap-1.5 shrink-0 overflow-x-auto no-scrollbar scrollbar-none">
           {roles.map((item) => {
             const Icon = item.icon;
             const isActive = role === item.key;

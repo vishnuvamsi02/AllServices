@@ -467,8 +467,8 @@ export default function CustomerDashboardPage() {
                   No completed vehicle services recorded yet this month.
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
+                <div className="overflow-x-auto no-scrollbar scrollbar-none">
+                  <table className="w-full text-left text-xs min-w-[580px]">
                     <thead>
                       <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase tracking-wider">
                         <th className="py-2.5 px-3">#</th>

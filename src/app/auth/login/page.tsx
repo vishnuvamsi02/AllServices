@@ -172,6 +172,30 @@ function LoginForm() {
             </p>
           </div>
 
+          {/* Admin Portal Fast Link */}
+          <div className="mb-4 p-3.5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl flex items-center justify-between gap-3 shadow-md border border-white/10">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shrink-0">
+                <Crown className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-xs font-black block text-amber-300">
+                  {isTelugu ? 'గ్రామ & రాష్ట్ర అడ్మిన్ లాగిన్' : 'Village & Super Admin Command'}
+                </span>
+                <span className="text-[10px] text-slate-300 block">
+                  {isTelugu ? 'పంచాయతీ & రాష్ట్ర డైరెక్టరేట్ అధికారిక పోర్టల్' : 'Dedicated secure portal for Panchayat & State Directors'}
+                </span>
+              </div>
+            </div>
+            <Link
+              href="/admin/login"
+              className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-slate-950 rounded-xl text-xs font-black shrink-0 transition-all shadow-xs flex items-center gap-1"
+            >
+              <span>Admin Login</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
           {/* Interactive Role Selector Pills */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 p-1.5 bg-slate-100 rounded-2xl mb-4 text-xs font-bold">
             
